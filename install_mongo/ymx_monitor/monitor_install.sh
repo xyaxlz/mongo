@@ -1,0 +1,20 @@
+#!/bin/bash
+
+rpm --import http://repo.zabbix.com/RPM-GPG-KEY-ZABBIX
+rpm -Uv  http://repo.zabbix.com/zabbix/2.4/rhel/6/x86_64/zabbix-release-2.4-1.el6.noarch.rpm
+yum clean all
+yum install zabbix-agent -y
+mv  -f  /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.confbak
+echo 'PidFile=/var/run/zabbix/zabbix_agentd.pid'> /etc/zabbix/zabbix_agentd.conf
+echo 'LogFile=/var/log/zabbix/zabbix_agentd.log'>> /etc/zabbix/zabbix_agentd.conf
+echo 'LogFileSize=0'>> /etc/zabbix/zabbix_agentd.conf
+echo 'Server=10.110.16.21'>> /etc/zabbix/zabbix_agentd.conf
+echo 'ServerActive=10.110.16.21'>> /etc/zabbix/zabbix_agentd.conf
+echo "Hostname="aws_"`hostname |awk -F '.' '{print $1}'`" >> /etc/zabbix/zabbix_agentd.conf
+echo 'Include=/etc/zabbix/zabbix_agentd.d/'>> /etc/zabbix/zabbix_agentd.conf
+
+\cp mongodb.conf  /etc/zabbix/zabbix_agentd.d/
+a=`awk "/port:/{print $1}" /etc/mongod.conf|awk '{print $2}'`
+echo $a
+sed -i "s/27017/$a/g" /etc/zabbix/zabbix_agentd.d/mongodb.conf  
+/etc/init.d/zabbix-agent restart

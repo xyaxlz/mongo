@@ -1,0 +1,38 @@
+
+show dbs
+use local
+db.dropDatabase()
+use admin 
+db.dropDatabase()
+show dbs
+
+use admin
+db.system.version.save({ "_id" : "authSchema", "currentVersion" : 3 })
+db.createUser({user:"admin",pwd:"pandatv#>!$999",roles:[{"role" : "userAdminAnyDatabase",db:"admin"},{"role" : "readWriteAnyDatabase",db:"admin"},{"role" : "clusterAdmin",db:"admin"},{"role" : "dbAdminAnyDatabase",db:"admin"}]})
+db.createRole({role: "monitor",privileges: [{ resource: { cluster: true }, actions: [ "serverStatus" ] }],roles: []})
+db.createUser({user:"monitor",pwd:"monitor#>!$",roles:[{"role" : "monitor",db:"admin"}]})
+
+db.createUser({user:"mongo",pwd:"4e68bfbe75db303r",roles:[{"role" : "readWriteAnyDatabase",db:"admin"}]})
+
+
+
+PORT=
+
+openssl rand -base64 753 >  /data/mongodb/$PORT/etc/mongodb-keyfile
+chmod 400  /data/mongodb/$PORT/etc/mongodb-keyfile
+chown mongod.mongod /data/mongodb/$PORT/etc/mongodb-keyfile
+
+cat /data/mongodb/$PORT/etc/mongodb-keyfile
+
+vim /data/mongodb/$PORT/etc/mongodb-keyfile
+
+config = {"_id" : "repl_7108", 
+            "members" : [
+            {"_id" : 0, "host" : "10.110.16.232:7108",priority:6},
+            {"_id" : 1, "host" : "10.110.16.231:7108",priority:5},
+            {"_id" : 2, "host" : "10.110.16.57:7108",priority:0}
+        ]}
+
+rs.initiate(config)
+rs.status()
+

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if ! expr $1 + 0 &>/dev/null;then
+	echo "$1 is not number"	
+	exit
+fi
+
+PORT=$1
+
+install()
+{
+	! id mongod >/dev/null 2>&1 && useradd mongod -s /sbin/nologin 
+	mkdir -p  /data/mongodb/$PORT/log/
+	mkdir -p  /data/mongodb/$PORT/data/
+	mkdir -p  /data/mongodb/$PORT/etc/
+
+	chown mongod.mongod -R /data/mongodb/$PORT
+	\cp -f mongod  /etc/init.d/mongod_$PORT
+	\cp -f mongod.conf /data/mongodb/$PORT/etc/
+	sed -i "s/27017/${PORT}/g" /data/mongodb/$PORT/etc/mongod.conf
+	sed -i "s/27017/${PORT}/g" /etc/init.d/mongod_$PORT
+	chmod +x /etc/init.d/mongod_$PORT
+	chkconfig --add mongod_$PORT
+	chkconfig  mongod_$PORT on
+	/etc/init.d/mongod_$PORT start
+}
+
+
+uninstall()
+{
+	/etc/init.d/mongod_$PORT stop
+	chkconfig --del mongod_$PORT
+	rm -rf   /data/mongodb/$PORT
+	rm -rf   /etc/init.d/mongod_$PORT
+}
+
+$2

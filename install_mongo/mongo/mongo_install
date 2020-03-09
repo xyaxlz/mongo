@@ -1,0 +1,26 @@
+#!/bin/bash
+useradd mongod -s /sbin/nologin 
+mkdir -p  /data/mongodb/log/
+mkdir -p  /data/mongodb/data/
+mkdir -p  /data/mongodb/etc/
+chown mongod.mongod -R /data/mongodb
+\cp -f mongod  /etc/init.d/
+\cp -f mongod.conf /etc/
+chmod +x /etc/init.d/mongod
+chkconfig --add mongod
+chkconfig  mongod on
+
+
+#openssl rand -base64 753 >  /data/mongodb/etc/mongodb-keyfile
+#chmod 400  /data/mongodb/etc/mongodb-keyfile
+#chown mongod.mongod /data/mongodb/etc/mongodb-keyfile
+#cat /data/mongodb/etc/mongodb-keyfile
+#
+#vim /data/mongodb/etc/mongodb-keyfile
+#config = {"_id" : "repl_7107", 
+#            "members" : [
+#            {"_id" : 0, "host" : "10.110.16.164:7107",priority:2},
+#            {"_id" : 1, "host" : "10.110.17.42:7107",priority:1},
+#            {"_id" : 2, "host" : "10.110.17.43:7107",priority:0}
+#        ]}
+#rs.initiate(config)
